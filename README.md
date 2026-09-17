@@ -1,69 +1,69 @@
-# Object Detection on Raspberry Pi 5 with Google Coral USB
+# Nhận diện vật thể trên Raspberry Pi 5 với Google Coral USB
 
-This repository provides a complete guide and all necessary scripts to run and train a custom object detection model on Raspberry Pi 5 using Google Coral USB Accelerator and TensorFlow Lite.
+Repo này cung cấp hướng dẫn đầy đủ cùng toàn bộ script cần thiết để chạy và huấn luyện mô hình nhận diện vật thể tùy chỉnh trên Raspberry Pi 5, dùng Google Coral USB Accelerator và TensorFlow Lite.
 
-Tutorial video: https://youtu.be/AE6fcQHJ_lE
-
----
-
-## Credits
-
-This project is based on the original tutorial by: https://www.youtube.com/watch?v=fVmAeK-GLXA&t=837s
-
-Commands and scripts have been modified to work correctly on Raspberry Pi 5.
+Video hướng dẫn: https://youtu.be/AE6fcQHJ_lE
 
 ---
 
-## Overview
+## Ghi công
 
-This project walks you through:
-- Setting up Python 3.9.12 on Raspberry Pi 5 using pyenv
-- Installing and configuring Google Coral USB EdgeTPU
-- Running real-time object detection with TensorFlow Lite
-- Annotating custom images with LabelImg
-- Training a custom EfficientDet Lite model on Google Colab
-- Deploying the trained model back to Raspberry Pi 5
+Dự án này dựa trên hướng dẫn gốc tại: https://www.youtube.com/watch?v=fVmAeK-GLXA&t=837s
+
+Các lệnh và script đã được chỉnh sửa để chạy đúng trên Raspberry Pi 5.
 
 ---
 
-## Requirements
+## Tổng quan
 
-**Hardware:**
+Dự án hướng dẫn bạn qua các bước:
+- Cài Python 3.9.12 trên Raspberry Pi 5 bằng pyenv
+- Cài đặt và cấu hình Google Coral USB EdgeTPU
+- Chạy nhận diện vật thể thời gian thực với TensorFlow Lite
+- Gán nhãn ảnh tùy chỉnh bằng LabelImg
+- Huấn luyện mô hình EfficientDet Lite tùy chỉnh trên Google Colab
+- Triển khai mô hình đã huấn luyện ngược lại lên Raspberry Pi 5
+
+---
+
+## Yêu cầu
+
+**Phần cứng:**
 - Raspberry Pi 5
 - Google Coral USB Accelerator
-- USB Camera
+- Camera USB
 
-**Software:**
-- Raspberry Pi OS (64-bit recommended)
-- Python 3.9.12 (via pyenv)
+**Phần mềm:**
+- Raspberry Pi OS (khuyến nghị bản 64-bit)
+- Python 3.9.12 (qua pyenv)
 - Google Coral EdgeTPU runtime
 - TensorFlow Lite runtime
-- LabelImg (for annotation)
+- LabelImg (để gán nhãn)
 
 ---
 
-## Repository Structure
+## Cấu trúc repo
 
 ```
 .
-├── detect.py                          # Main object detection script (runs inference on camera)
-├── train.py                           # Training script for Google Colab
-├── test.py                            # Copies metadata from best.tflite to best_edgetpu.tflite
-├── labelImg.py                        # Patched LabelImg source file
-├── canvas.py                          # Patched canvas source file for LabelImg
-├── labelimg.sh                        # Shell script to install and patch LabelImg
-├── tflite_custom_model_edgetpu.ipynb  # Google Colab notebook for training
-├── tensorflow-lite-bullseye-main.zip  # TensorFlow Lite setup package
-└── rpi5.txt                           # Additional notes for Raspberry Pi 5 setup
+├── detect.py                          # Script nhận diện chính (chạy suy luận trên camera)
+├── train.py                           # Script huấn luyện dùng cho Google Colab
+├── test.py                            # Chép metadata từ best.tflite sang best_edgetpu.tflite
+├── labelImg.py                        # File nguồn LabelImg đã vá
+├── canvas.py                          # File nguồn canvas đã vá cho LabelImg
+├── labelimg.sh                        # Script shell để cài và vá LabelImg
+├── tflite_custom_model_edgetpu.ipynb  # Notebook Google Colab để huấn luyện
+├── tensorflow-lite-bullseye-main.zip  # Gói cài đặt TensorFlow Lite
+└── rpi5.txt                           # Ghi chú bổ sung khi cài đặt trên Raspberry Pi 5
 ```
 
 ---
 
-## Step 1: Install Python 3.9.12 with pyenv
+## Bước 1: Cài Python 3.9.12 bằng pyenv
 
-Open a terminal on your Raspberry Pi and run each command one at a time.
+Mở terminal trên Raspberry Pi và chạy từng lệnh một.
 
-**1.1 Update and upgrade the system:**
+**1.1 Cập nhật và nâng cấp hệ thống:**
 
 ```bash
 sudo apt-get update
@@ -73,7 +73,7 @@ sudo apt-get update
 sudo apt-get upgrade
 ```
 
-**1.2 Create the project folder and enter it:**
+**1.2 Tạo thư mục dự án và vào thư mục đó:**
 
 ```bash
 mkdir freedomtech
@@ -83,13 +83,13 @@ mkdir freedomtech
 cd freedomtech
 ```
 
-**1.3 Install pyenv:**
+**1.3 Cài pyenv:**
 
 ```bash
 curl https://pyenv.run | bash
 ```
 
-**1.4 Add pyenv to your shell configuration (run each line separately):**
+**1.4 Thêm pyenv vào cấu hình shell (chạy từng dòng riêng):**
 
 ```bash
 echo 'export PATH="$HOME/.pyenv/bin:$PATH"' >> ~/.bashrc
@@ -107,25 +107,25 @@ echo 'eval "$(pyenv virtualenv-init -)"' >> ~/.bashrc
 exec "$SHELL"
 ```
 
-**1.5 Install required build dependencies:**
+**1.5 Cài các gói phụ thuộc cần cho quá trình build:**
 
 ```bash
 sudo apt-get install --yes libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev llvm libncurses-dev xz-utils tk-dev libgdbm-dev lzma tcl-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev wget curl make build-essential openssl
 ```
 
-**1.6 Install Python 3.9.12:**
+**1.6 Cài Python 3.9.12:**
 
 ```bash
 pyenv install 3.9.12
 ```
 
-**1.7 Set Python 3.9.12 as the local version:**
+**1.7 Đặt Python 3.9.12 làm phiên bản local:**
 
 ```bash
 pyenv local 3.9.12
 ```
 
-**1.8 Verify the Python version:**
+**1.8 Kiểm tra lại phiên bản Python:**
 
 ```bash
 python --version
@@ -133,53 +133,53 @@ python --version
 
 ---
 
-## Step 2: Install Google Coral USB EdgeTPU
+## Bước 2: Cài Google Coral USB EdgeTPU
 
-**2.1 Create a Python virtual environment:**
+**2.1 Tạo môi trường ảo Python:**
 
 ```bash
 python3 -m venv .venv
 ```
 
-**2.2 Activate the virtual environment:**
+**2.2 Kích hoạt môi trường ảo:**
 
 ```bash
 source .venv/bin/activate
 ```
 
-**2.3 Create the keyrings directory:**
+**2.3 Tạo thư mục keyrings:**
 
 ```bash
 sudo mkdir -p /etc/apt/keyrings
 ```
 
-**2.4 Download and add the Coral GPG key:**
+**2.4 Tải và thêm khóa GPG của Coral:**
 
 ```bash
 curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo gpg --dearmor -o /etc/apt/keyrings/coral-edgetpu.gpg
 ```
 
-**2.5 Add the Coral package repository:**
+**2.5 Thêm repository gói của Coral:**
 
 ```bash
 echo "deb [signed-by=/etc/apt/keyrings/coral-edgetpu.gpg] https://packages.cloud.google.com/apt coral-edgetpu-stable main" | sudo tee /etc/apt/sources.list.d/coral-edgetpu.list
 ```
 
-**2.6 Update the package list:**
+**2.6 Cập nhật danh sách gói:**
 
 ```bash
 sudo apt-get update
 ```
 
-**2.7 Install the EdgeTPU runtime:**
+**2.7 Cài EdgeTPU runtime:**
 
 ```bash
 sudo apt-get install libedgetpu1-std
 ```
 
-Reboot the Raspberry Pi after installation completes.
+Khởi động lại Raspberry Pi sau khi cài xong.
 
-**2.8 After reboot, re-enter the project folder and activate the virtual environment:**
+**2.8 Sau khi khởi động lại, vào lại thư mục dự án và kích hoạt môi trường ảo:**
 
 ```bash
 cd freedomtech
@@ -191,9 +191,9 @@ source .venv/bin/activate
 
 ---
 
-## Step 3: Install TensorFlow Lite
+## Bước 3: Cài TensorFlow Lite
 
-Extract `tensorflow-lite-bullseye-main.zip` into the `freedomtech` folder, then run:
+Giải nén `tensorflow-lite-bullseye-main.zip` vào thư mục `freedomtech`, rồi chạy:
 
 ```bash
 cd tensorflow-lite-bullseye-main
@@ -201,23 +201,23 @@ chmod 775 tensorflow-lite.sh
 bash tensorflow-lite.sh
 ```
 
-The `tensorflow-lite.sh` script will:
-- Upgrade pip
-- Install tflite-runtime
-- Clone the TensorFlow examples repository
+Script `tensorflow-lite.sh` sẽ:
+- Nâng cấp pip
+- Cài tflite-runtime
+- Clone repository TensorFlow examples
 
-After the script finishes, navigate to the object detection example and run setup:
+Sau khi script chạy xong, chuyển tới ví dụ object detection và chạy phần setup:
 
 ```bash
 cd examples/lite/examples/object_detection/raspberry_pi/
 bash setup.sh
 ```
 
-Check the OpenCV version installed and update `requirements.txt` if needed before running `setup.sh`.
+Kiểm tra phiên bản OpenCV đã cài và cập nhật `requirements.txt` nếu cần, trước khi chạy `setup.sh`.
 
-Copy `detect.py` from this repository into the `freedomtech` folder. Make sure the Python version inside `detect.py` matches 3.9.12.
+Chép `detect.py` từ repo này vào thư mục `freedomtech`. Đảm bảo phiên bản Python ghi trong `detect.py` khớp với 3.9.12.
 
-Run a quick test with the pre-built model:
+Chạy thử nhanh với mô hình dựng sẵn:
 
 ```bash
 python detect.py --model efficientdet_lite0_edgetpu.tflite --enableEdgeTPU
@@ -225,9 +225,9 @@ python detect.py --model efficientdet_lite0_edgetpu.tflite --enableEdgeTPU
 
 ---
 
-## Step 4: Install and Configure LabelImg
+## Bước 4: Cài và cấu hình LabelImg
 
-Open a new terminal that is NOT inside the virtual environment, then run:
+Mở một terminal mới KHÔNG ở trong môi trường ảo, rồi chạy:
 
 ```bash
 sudo rm /usr/lib/python3.13/EXTERNALLY-MANAGED
@@ -235,26 +235,26 @@ sudo rm /usr/lib/python3.13/EXTERNALLY-MANAGED
 cd Pi5_object_detection_with_coral-main/
 ```
 
-Check the Python version inside `labelimg.sh` and update it to match your system, then install:
+Kiểm tra phiên bản Python ghi trong `labelimg.sh` và sửa cho khớp với hệ thống của bạn, sau đó cài:
 
 ```bash
 chmod 775 labelimg.sh
 bash labelimg.sh
 ```
 
-If you see this warning after launching LabelImg:
+Nếu sau khi mở LabelImg bạn thấy cảnh báo:
 
 ```
 QStandardPaths: wrong permissions on runtime directory
 ```
 
-Fix it with:
+Khắc phục bằng:
 
 ```bash
 chmod 0700 /run/user/1000
 ```
 
-Launch LabelImg:
+Mở LabelImg:
 
 ```bash
 labelImg
@@ -262,57 +262,57 @@ labelImg
 
 ---
 
-## Step 5: Capture Training Images with img.py
+## Bước 5: Chụp ảnh huấn luyện bằng img.py
 
-Before annotating, you need a dataset of images. Use `img.py` to capture images from your camera directly on the Raspberry Pi.
+Trước khi gán nhãn, bạn cần có một bộ ảnh dữ liệu. Dùng `img.py` để chụp ảnh từ camera trực tiếp trên Raspberry Pi.
 
-**5.1 Create the images folder:**
+**5.1 Tạo thư mục images:**
 
 ```bash
 mkdir images
 ```
 
-**5.2 Open `img.py` and update the save path** to point to your `images` folder. Find this line and replace the path:
+**5.2 Mở `img.py` và cập nhật đường dẫn lưu ảnh** trỏ tới thư mục `images` của bạn. Tìm dòng sau và thay đường dẫn:
 
 ```python
 cv2.imwrite("/home/pi/Downloads/yolov8-custom-object-detection-googlecoralusb-main/images/arduino_uno_%d.jpg" %cpt, frame)
 ```
 
-Change it to match the actual path of your `images` folder, for example:
+Sửa lại cho khớp đường dẫn thật của thư mục `images`, ví dụ:
 
 ```python
 cv2.imwrite("/home/pi/Pi5_object_detection_with_coral-main/Images/object_%d.jpg" %cpt, frame)
 ```
 
-You can also change the filename prefix (`object_`) to something that describes your target object.
+Bạn cũng có thể đổi tiền tố tên file (`object_`) thành tên mô tả vật thể của bạn.
 
-**5.3 Install opencv-python (use system Python 3.13, outside the virtual environment):**
+**5.3 Cài opencv-python (dùng Python 3.13 của hệ thống, bên ngoài môi trường ảo):**
 
 ```bash
 pip install opencv-python
 ```
 
-**5.4 Open img.py in thonny and run**
+**5.4 Mở img.py trong Thonny và chạy**
 
-While the script runs, move your object in front of the camera:
-- Move it left and right
-- Move it closer and further away
-- Rotate it to capture different angles
-- Vary the background and lighting if possible
+Trong lúc script chạy, hãy di chuyển vật thể trước camera:
+- Đưa qua trái, qua phải
+- Đưa lại gần, ra xa
+- Xoay vật để lấy nhiều góc khác nhau
+- Thay đổi phông nền và ánh sáng nếu có thể
 
-The script will capture 30 frames by default and save them to the `images` folder. If you want more image change in code
+Mặc định script sẽ chụp 30 khung hình và lưu vào thư mục `images`. Nếu muốn nhiều ảnh hơn thì sửa trong code.
 
 ---
 
-## Step 6: Annotate Images
+## Bước 6: Gán nhãn ảnh
 
-1. Launch LabelImg.
-2. Click **Open Dir** and navigate to your `images` folder.
-3. Click **Change Save Dir** and set it to the same `images` folder so annotations are saved alongside the images.
-4. Draw bounding boxes around objects and assign class labels.
-5. Save annotations in Pascal VOC (XML) format.
+1. Mở LabelImg.
+2. Bấm **Open Dir** và trỏ tới thư mục `images` của bạn.
+3. Bấm **Change Save Dir** và đặt về cùng thư mục `images` để file nhãn được lưu cạnh ảnh.
+4. Vẽ khung bao quanh vật thể và gán nhãn lớp.
+5. Lưu nhãn ở định dạng Pascal VOC (XML).
 
-After annotation, organize your dataset:
+Sau khi gán nhãn xong, sắp xếp lại bộ dữ liệu:
 
 ```
 freedomtech/
@@ -328,58 +328,58 @@ freedomtech/
 
 ---
 
-## Step 7: Train the Model on Google Colab
+## Bước 7: Huấn luyện mô hình trên Google Colab
 
-Compress the dataset folder:
+Nén thư mục dữ liệu:
 
 ```bash
 sudo zip -r freedomtech.zip freedomtech/*
 ```
 
-Upload `freedomtech.zip` to Google Drive.
+Tải `freedomtech.zip` lên Google Drive.
 
-Open `tflite_custom_model_edgetpu.ipynb` in Google Colab:
-- Go to Runtime > Change runtime type
-- Set Hardware accelerator to GPU (T4)
-- Run each cell sequentially
+Mở `tflite_custom_model_edgetpu.ipynb` trong Google Colab:
+- Vào Runtime > Change runtime type
+- Đặt Hardware accelerator là GPU (T4)
+- Chạy lần lượt từng cell
 
-Before running cell 8, upload `train.py` to the Colab session. Open `train.py` and update the class names to match your annotation labels:
+Trước khi chạy cell 8, hãy tải `train.py` lên phiên Colab. Mở `train.py` và cập nhật tên các lớp cho khớp với nhãn bạn đã gán:
 
 ```python
 train_data = object_detector.DataLoader.from_pascal_voc(
     'freedomtech/train',
     'freedomtech/train',
-    ['your_class_1', 'your_class_2']   # Replace with your actual class names
+    ['your_class_1', 'your_class_2']   # Thay bằng tên lớp thực tế của bạn
 )
 
 val_data = object_detector.DataLoader.from_pascal_voc(
     'freedomtech/validate',
     'freedomtech/validate',
-    ['your_class_1', 'your_class_2']   # Replace with your actual class names
+    ['your_class_1', 'your_class_2']   # Thay bằng tên lớp thực tế của bạn
 )
 ```
 
-The training script uses `EfficientDet Lite0` with the following default configuration:
+Script huấn luyện dùng `EfficientDet Lite0` với cấu hình mặc định:
 - Batch size: 4
 - Epochs: 100
-- Full model fine-tuning: enabled
+- Fine-tune toàn bộ mô hình: bật
 
-After training completes, the output file `best.tflite` will be exported.
+Sau khi huấn luyện xong, file kết quả `best.tflite` sẽ được xuất ra.
 
-Before running cell 12, upload `test.py` to the Colab session. This script copies metadata from `best.tflite` into `best_edgetpu.tflite` so the model is compatible with the Coral EdgeTPU compiler.
+Trước khi chạy cell 12, hãy tải `test.py` lên phiên Colab. Script này chép metadata từ `best.tflite` sang `best_edgetpu.tflite` để mô hình tương thích với trình biên dịch Coral EdgeTPU.
 
-If you encounter errors or need to modify the code, always reset the environment fully:
+Nếu gặp lỗi hoặc cần sửa code, luôn reset môi trường hoàn toàn:
 1. Edit > Clear all outputs
 2. Runtime > Disconnect and delete runtime
-3. Restart session
+3. Khởi động lại phiên
 
 ---
 
-## Step 8: Deploy the Trained Model to Raspberry Pi 5
+## Bước 8: Triển khai mô hình đã huấn luyện lên Raspberry Pi 5
 
-Download `best_edgetpu.tflite` from Google Colab and copy it to the `freedomtech` folder on your Raspberry Pi.
+Tải `best_edgetpu.tflite` từ Google Colab về và chép vào thư mục `freedomtech` trên Raspberry Pi.
 
-Activate the virtual environment and run object detection with your custom model:
+Kích hoạt môi trường ảo và chạy nhận diện vật thể với mô hình tùy chỉnh của bạn:
 
 ```bash
 source .venv/bin/activate
@@ -388,15 +388,15 @@ python detect.py --model best_edgetpu.tflite --enableEdgeTPU
 
 ---
 
-## Notes
+## Ghi chú
 
-- Always remember to rename class labels in `train.py` to match your dataset before training.
-- The `labelimg.sh` script must use the correct Python version matching your system installation.
-- Using `libedgetpu1-std` (standard speed) is recommended for stable operation. The `libedgetpu1-max` package runs the TPU at maximum clock speed but may cause the device to run hot.
-- The `test.py` script requires both `best.tflite` and `best_edgetpu.tflite` to exist in the same directory before running.
+- Luôn nhớ đổi tên nhãn lớp trong `train.py` cho khớp bộ dữ liệu của bạn trước khi huấn luyện.
+- Script `labelimg.sh` phải dùng đúng phiên bản Python khớp với bản cài trên hệ thống.
+- Khuyến nghị dùng `libedgetpu1-std` (tốc độ tiêu chuẩn) để hoạt động ổn định. Gói `libedgetpu1-max` chạy TPU ở xung nhịp tối đa nhưng có thể làm thiết bị nóng.
+- Script `test.py` yêu cầu cả `best.tflite` và `best_edgetpu.tflite` phải nằm cùng thư mục trước khi chạy.
 
 ---
 
-## License
+## Giấy phép
 
-This project is based on the TensorFlow Examples repository, licensed under the Apache License 2.0.
+Dự án này dựa trên repository TensorFlow Examples, cấp phép theo Apache License 2.0.
